@@ -1,0 +1,167 @@
+/* Adjust overall dashboard zoom level */
+body {
+    zoom: 85%;
+}
+
+#sidebar {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: #1c1919;
+    position: fixed; /* Add fixed positioning */
+    top: 0;
+    left: 0;
+    width: 25rem;
+    height: 100%; /* Make sure it covers the full viewport height */
+    overflow-y: auto; /* Add scroll if content overflows */
+    transition: width 0.3s ease; /* Add transition for smooth animation */
+}
+
+#sidebar h2 {
+    text-align: left;
+    margin-bottom: 0;
+}
+
+/* Hide the blurb on a small screen */
+#blurb {
+    display: none;
+}
+
+#sidebar-toggle {
+    display: none;
+}
+
+#collapse *:first-child {
+    margin-top: 1rem;
+}
+
+/* add the three horizontal bars icon for the toggle */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;%3csvg viewBox=0 0 30 30 xmlns=http://www.w3.org/2000/svg%3e%3cpath stroke=rgba(0; 0; 0; 0.5) stroke-width=2 stroke-linecap=round stroke-miterlimit=10 d=M4 7h22M4 15h22M4 23h22/%3e%3c/svg%3e");
+}
+
+#page-content {
+    padding: 2rem 1rem;
+    transition: margin-left 0.3s ease; /* Add transition for smooth animation */
+}
+
+/* styling the button */
+.my-button-class {
+    background-color: #017b70;
+    font-weight: bold;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.my-button-class span {
+    margin-right: 10px;
+}
+
+.my-button-class:hover {
+    background-color: red;
+}
+
+@media (min-width: 48em) {
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 25rem; /* Change width of the sidebar*/
+        text-align: left;
+        transition: margin 0.3s ease-in-out;
+    }
+
+    #sidebar-toggle {
+        display: inline-block;
+        position: relative;
+        top: 0;
+        transition: top 0.3s ease-in-out;
+    }
+
+    /* add negative margin to sidebar to achieve the collapse */
+    #sidebar.collapsed {
+        margin-left: -20.5rem; /* Updated margin */
+        padding-right: 0.5rem;
+    }
+
+    /* move the sidebar toggle up to the top left corner */
+    #sidebar.collapsed #sidebar-toggle {
+        top: -2rem;
+    }
+
+    /* also adjust margin of page content */
+    #sidebar.collapsed ~ #page-content {
+        margin-left: 6.5rem;
+    }
+
+    /* move all contents of navbar other than header
+    (containing toggle) further off-screen */
+    #sidebar.collapsed > *:not(:first-child) {
+        margin-left: -6rem;
+        margin-right: 6rem;
+    }
+
+    /* reveal the blurb on a large screen */
+    #blurb {
+        display: block;
+    }
+
+    /* Hide the toggle on a large screen */
+    #navbar-toggle {
+        display: none;
+    }
+
+    #collapse {
+        display: block;
+    }
+
+    /* set margins of the main content so that it doesnt overlap the sidebar */
+    #page-content {
+        margin-left: 25rem; /* Updated margin */
+        margin-right: 2rem;
+        transition: margin-left 0.3s ease-in-out;
+    }
+}
+
+/* dcc.Upload styling parameters*/
+.dcc-upload {
+    width: 60%;
+    height: 60px;
+    line-height: 60px;
+    border-width: 1px;
+    border-style: dashed;
+    border-radius: 50px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* Change color of link on hover */
+a:hover {
+    color: red;
+}
+
+.custom-link {
+    color: #10e84a;
+    text-decoration: none;
+}
+
+.custom-link:hover {
+    color: red;
+    text-decoration: none;
+}
+
+/* Set the placeholder color of dbc.Input*/
+.custom-placeholder::placeholder {
+    color: darkgray;
+}
+
+/* Set the color of the active ref link (Home, simple, and advanced) */
+.nav-pills .nav-link.active {
+    color: #fff;
+    background-color: rgb(27, 147, 207);
+}
