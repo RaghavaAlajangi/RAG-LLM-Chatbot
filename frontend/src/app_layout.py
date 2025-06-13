@@ -78,7 +78,7 @@ app.layout = dmc.MantineProvider(
 
 
 @callback(
-    Output("user_status", "children"),
+    Output("user_login_status", "children"),
     Input("ref_url", "pathname"),
 )
 def update_authentication_status(_):

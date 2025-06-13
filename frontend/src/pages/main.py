@@ -151,7 +151,7 @@ def sidebar_layout():
                         }
                     ),
                     html.Div(
-                        id="user_status",
+                        id="user_login_status",
                         style={
                             "margin-bottom": "10px",
                         },
