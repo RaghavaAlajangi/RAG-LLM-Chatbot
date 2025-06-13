@@ -38,7 +38,13 @@ layout = html.Div(
                         ),
                         html.Br(),
                         dmc.Group(
-                            [dmc.Button("Login", id="login-button")],
+                            [
+                                dmc.Button(
+                                    "Login",
+                                    id="login-button",
+                                    color="#494646",
+                                )
+                            ],
                             justify="center",
                         ),
                     ],
