@@ -70,7 +70,8 @@ def load_user(username):
 
 app.layout = dmc.MantineProvider(
     [
-        dcc.Location(id="ref_url", refresh=False),
+        dcc.Location(id="app_url", refresh=False),
+        dcc.Location(id="main_url", refresh=False),
         html.Div(id="app_content"),
     ]
 )
@@ -78,7 +79,7 @@ app.layout = dmc.MantineProvider(
 
 @callback(
     Output("app_content", "children"),
-    Input("ref_url", "pathname"),
+    Input("app_url", "pathname"),
 )
 def display_app_pages(pathname):
     if pathname == "/":
@@ -91,7 +92,7 @@ def display_app_pages(pathname):
 
 @callback(
     Output("page_content", "children"),
-    Input("ref_url", "pathname"),
+    Input("main_url", "pathname"),
     prevent_initial_call=True,
 )
 def navigate_main_content(pathname):
@@ -105,7 +106,7 @@ def navigate_main_content(pathname):
 
 @callback(
     Output("auth_status", "children"),
-    Input("ref_url", "pathname"),
+    Input("app_url", "pathname"),
 )
 def update_auth_status(_):
     if current_user.is_authenticated:
