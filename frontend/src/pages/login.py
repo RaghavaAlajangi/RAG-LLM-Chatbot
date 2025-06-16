@@ -27,19 +27,19 @@ def layout():
                             dmc.TextInput(
                                 label="Username",
                                 placeholder="Enter username",
-                                id="uname-box",
+                                id="username_box",
                             ),
                             dmc.PasswordInput(
                                 label="Password",
                                 placeholder="Enter password",
-                                id="pwd-box",
+                                id="password_box",
                             ),
                             html.Br(),
                             dmc.Group(
                                 [
                                     dmc.Button(
                                         "Login",
-                                        id="login-button",
+                                        id="login_button",
                                         color="#494646",
                                     )
                                 ],
@@ -53,6 +53,6 @@ def layout():
                     ),
                 ],
             ),
-            html.Div(children="", id="output-state"),
+            html.Div(children="", id="show_auth_status"),
         ],
     )

@@ -114,10 +114,10 @@ def update_auth_status(_):
 
 
 @callback(
-    Output("output-state", "children"),
-    Input("login-button", "n_clicks"),
-    State("uname-box", "value"),
-    State("pwd-box", "value"),
+    Output("show_auth_status", "children"),
+    Input("login_button", "n_clicks"),
+    State("username_box", "value"),
+    State("password_box", "value"),
     prevent_initial_call=True,
 )
 def login_button_click(n_clicks, username, password):
