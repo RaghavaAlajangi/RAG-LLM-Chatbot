@@ -1,9 +1,6 @@
-import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, dcc, html
+from dash import Input, Output, State, callback, html
 from dash_iconify import DashIconify
-
-dash.register_page(__name__)
 
 
 def line_breaks(times=1):
@@ -17,11 +14,11 @@ def sidebar_layout():
         children=[
             # Sidebar toggle button
             html.Button(
-                "☰",
+                DashIconify(icon="iconoir:sidebar-collapse"),
                 id="sidebar-toggle",
                 style={
                     "position": "absolute",
-                    "top": "10px",
+                    "top": "15px",
                     "right": "10px",
                     "zIndex": "1000",
                     "backgroundColor": "transparent",
@@ -57,56 +54,39 @@ def sidebar_layout():
             html.Br(),
             html.Br(),
             html.Br(),
-            dmc.NavLink(
-                label="Database",
-                leftSection=DashIconify(icon="octicon:database-16"),
-                children=[
-                    html.Div(
-                        style={
-                            "display": "flex",
-                            "align-items": "flex-end",
-                            "gap": "5px",  # Space between items
-                        },
-                        children=[
-                            dcc.Upload(
-                                id="upload-data",
-                                children=html.Div(
-                                    [
-                                        "Drag and Drop or ",
-                                        html.A("Select Files"),
-                                    ]
-                                ),
-                                style={
-                                    "width": "100%",
-                                    "height": "60px",
-                                    "lineHeight": "60px",
-                                    "borderWidth": "1px",
-                                    "borderStyle": "dashed",
-                                    "borderRadius": "5px",
-                                    "textAlign": "center",
-                                    "margin": "10px",
-                                },
-                                # Allow multiple files to be uploaded
-                                multiple=True,
-                            ),
-                            dmc.Button(
-                                "Fetch",
-                                id="scrape_click",
-                                variant="outline",
-                                disabled=False,
-                                rightSection=DashIconify(
-                                    icon="mdi:download-circle"
-                                ),
-                            ),
-                            html.Div(id="notifications_container"),
-                        ],
-                    ),
-                ],
-            ),
             # Chat history
             html.Div(
                 [
-                    dmc.Text("History", c="gray"),
+                    dmc.NavLink(
+                        label="Database",
+                        href="/database",
+                        leftSection=DashIconify(
+                            icon="mdi:database-outline",
+                            width=20,
+                        ),
+                        variant="subtle",
+                        color="white",
+                        active="partial",
+                    ),
+                    dmc.NavLink(
+                        label="New Chat",
+                        href="/new_chat",
+                        leftSection=DashIconify(
+                            icon="bx:chat",
+                            width=20,
+                        ),
+                        variant="subtle",
+                        color="white",
+                        active="partial",
+                    ),
+                    html.Hr(
+                        style={
+                            "borderColor": "white",
+                        }
+                    ),
+                    dmc.Text(
+                        "History", c="white", style={"marginLeft": "10px"}
+                    ),
                     html.Br(),
                     dmc.ScrollArea(
                         h=500,
@@ -116,7 +96,7 @@ def sidebar_layout():
                                 [
                                     dmc.NavLink(
                                         label=f"Chat {i+1}",
-                                        href=f"#{i+1}",
+                                        href=f"/{i+1}",
                                         leftSection=DashIconify(
                                             icon="tabler:gauge"
                                         ),
@@ -151,7 +131,7 @@ def sidebar_layout():
                         }
                     ),
                     html.Div(
-                        id="user_login_status",
+                        id="auth_status",
                         style={
                             "margin-bottom": "10px",
                         },
@@ -159,7 +139,7 @@ def sidebar_layout():
                 ],
                 style={
                     "position": "absolute",
-                    "bottom": "60px",
+                    "bottom": "20px",
                     "left": "20px",
                     "width": "calc(100% - 40px)",
                 },
@@ -180,26 +160,28 @@ def sidebar_layout():
     )
 
 
-layout = html.Div(
-    [
-        sidebar_layout(),
-        dcc.Location(id="url", refresh=False),
-        html.Div(
-            id="page-content",
-            style={
-                "align-items": "center",
-                "overflowX": "hidden",
-                "margin-left": "20rem",
-            },
-        ),
-    ]
-)
+def layout():
+    return html.Div(
+        [
+            sidebar_layout(),
+            html.Div(
+                id="page_content",
+                style={
+                    "align-items": "center",
+                    "overflowX": "hidden",
+                    "margin-left": "25rem",
+                },
+            ),
+        ]
+    )
 
 
 @callback(
-    [Output("sidebar", "style"), Output("page-content", "style")],
-    [Input("sidebar-toggle", "n_clicks")],
-    [State("sidebar", "style"), State("page-content", "style")],
+    Output("sidebar", "style"),
+    Output("page_content", "style"),
+    Input("sidebar-toggle", "n_clicks"),
+    State("sidebar", "style"),
+    State("page_content", "style"),
     prevent_initial_call=True,
 )
 def toggle_sidebar(n_clicks, sidebar_style, page_content_style):

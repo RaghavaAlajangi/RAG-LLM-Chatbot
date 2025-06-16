@@ -1,6 +1,5 @@
 import os
 
-import dash
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 
@@ -14,13 +13,14 @@ from dash import (
     callback,
     dcc,
     html,
+    no_update,
 )
-from dash_iconify import DashIconify
 from dotenv import load_dotenv
 from flask import Flask
 from flask_login import LoginManager, UserMixin, current_user, login_user
 
 from .credentials import VALID_USERNAME_PASSWORD
+from .pages import login, logout, main, upload
 
 load_dotenv()
 
@@ -36,7 +36,6 @@ DBC_CSS = (
 )
 
 app = Dash(
-    use_pages=True,
     server=server,
     suppress_callback_exceptions=True,
     title="RAGbot",
@@ -71,37 +70,46 @@ def load_user(username):
 
 app.layout = dmc.MantineProvider(
     [
-        dcc.Location(id="ref_url"),
-        dash.page_container,
+        dcc.Location(id="ref_url", refresh=False),
+        html.Div(id="app_content"),
     ]
 )
 
 
 @callback(
-    Output("user_login_status", "children"),
+    Output("app_content", "children"),
     Input("ref_url", "pathname"),
 )
-def update_authentication_status(_):
+def display_app_pages(pathname):
+    if pathname == "/":
+        return login.layout()
+    elif pathname == "/logout":
+        return logout.layout()
+    else:
+        return main.layout()
+
+
+@callback(
+    Output("page_content", "children"),
+    Input("ref_url", "pathname"),
+    prevent_initial_call=True,
+)
+def navigate_main_content(pathname):
+    if pathname == "/main":
+        return main.layout()
+    elif pathname == "/database":
+        return upload.layout()
+    else:
+        return no_update
+
+
+@callback(
+    Output("auth_status", "children"),
+    Input("ref_url", "pathname"),
+)
+def update_auth_status(_):
     if current_user.is_authenticated:
-        return (
-            html.A(
-                [
-                    DashIconify(
-                        icon="tabler:logout",
-                        style={"marginRight": "5px", "color": "white"},
-                    ),
-                    "Logout",
-                ],
-                href="/logout",
-                style={
-                    "color": "white",
-                    "textDecoration": "none",
-                    "fontSize": "16px",
-                    "display": "flex",
-                    "alignItems": "center",
-                },
-            ),
-        )
+        return logout.logout_click()
     return dcc.Location(href="/", id="login_link")
 
 

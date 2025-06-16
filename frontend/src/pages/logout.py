@@ -1,9 +1,7 @@
-import dash
 import dash_mantine_components as dmc
-from dash import dcc, html
+from dash import html
+from dash_iconify import DashIconify
 from flask_login import current_user, logout_user
-
-dash.register_page(__name__)
 
 
 def layout():
@@ -28,9 +26,18 @@ def layout():
                                 "You have been logged out",
                                 order=2,
                                 c="#494646",
-                                style={"textAlign": "center"},
+                                style={"textAlign": "left"},
                             ),
-                            dcc.Link("Login?", href="/"),
+                            dmc.Anchor(
+                                "Login again?",
+                                href="/",
+                                underline="always",
+                                style={
+                                    "textAlign": "left",
+                                    "color": "black",
+                                    "marginTop": "10px",
+                                },
+                            ),
                         ],
                         disabled=False,
                         variant="default",
@@ -40,4 +47,20 @@ def layout():
                 ],
             ),
         ]
+    )
+
+
+def logout_click():
+    return html.Div(
+        dmc.NavLink(
+            label="Logout",
+            href="/logout",
+            leftSection=DashIconify(
+                icon="tabler:logout",
+                width=20,
+            ),
+            variant="subtle",
+            color="white",
+            active="partial",
+        ),
     )
