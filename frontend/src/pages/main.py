@@ -1,5 +1,5 @@
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, html
+from dash import html
 from dash_iconify import DashIconify
 
 
@@ -179,23 +179,23 @@ def layout():
     )
 
 
-@callback(
-    Output("sidebar", "style"),
-    Output("page_content", "style"),
-    Input("sidebar_toggle", "n_clicks"),
-    State("sidebar", "style"),
-    State("page_content", "style"),
-    prevent_initial_call=True,
-)
-def toggle_sidebar(n_clicks, sidebar_style, page_content_style):
-    if n_clicks:
-        collapsed = sidebar_style.get("width") == "6rem"
-        new_sidebar_width = "25rem" if collapsed else "6rem"
-        new_margin_left = "25rem" if collapsed else "6rem"
+# @callback(
+#     Output("sidebar", "style"),
+#     Output("page_content", "style"),
+#     Input("sidebar_toggle", "n_clicks"),
+#     State("sidebar", "style"),
+#     State("page_content", "style"),
+#     prevent_initial_call=True,
+# )
+# def toggle_sidebar(n_clicks, sidebar_style, page_content_style):
+#     if n_clicks:
+#         collapsed = sidebar_style.get("width") == "6rem"
+#         new_sidebar_width = "25rem" if collapsed else "6rem"
+#         new_margin_left = "25rem" if collapsed else "6rem"
 
-        sidebar_style["width"] = new_sidebar_width
-        page_content_style["margin-left"] = new_margin_left
+#         sidebar_style["width"] = new_sidebar_width
+#         page_content_style["margin-left"] = new_margin_left
 
-        return sidebar_style, page_content_style
-    else:
-        return sidebar_style, page_content_style
+#         return sidebar_style, page_content_style
+#     else:
+#         return sidebar_style, page_content_style
