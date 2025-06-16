@@ -95,7 +95,7 @@ body {
     }
 
     /* also adjust margin of page content */
-    #sidebar.collapsed ~ #page-content {
+    #sidebar.collapsed ~ #page_content {
         margin-left: 6.5rem;
     }
 
