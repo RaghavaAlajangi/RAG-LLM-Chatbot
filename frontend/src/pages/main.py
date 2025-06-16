@@ -15,7 +15,7 @@ def sidebar_layout():
             # Sidebar toggle button
             html.Button(
                 DashIconify(icon="iconoir:sidebar-collapse"),
-                id="sidebar-toggle",
+                id="sidebar_toggle",
                 style={
                     "position": "absolute",
                     "top": "15px",
@@ -54,9 +54,10 @@ def sidebar_layout():
             html.Br(),
             html.Br(),
             html.Br(),
-            # Chat history
+            # Menu links
             html.Div(
                 [
+                    # Database link
                     dmc.NavLink(
                         label="Database",
                         href="/database",
@@ -68,6 +69,7 @@ def sidebar_layout():
                         color="white",
                         active="partial",
                     ),
+                    # New Chat link
                     dmc.NavLink(
                         label="New Chat",
                         href="/new_chat",
@@ -84,6 +86,7 @@ def sidebar_layout():
                             "borderColor": "white",
                         }
                     ),
+                    # History section
                     dmc.Text(
                         "History", c="white", style={"marginLeft": "10px"}
                     ),
@@ -121,7 +124,7 @@ def sidebar_layout():
                     "left": "0px",
                 },
             ),
-            # User Login and settings
+            # User Logout section
             html.Div(
                 [
                     html.Hr(
@@ -179,7 +182,7 @@ def layout():
 @callback(
     Output("sidebar", "style"),
     Output("page_content", "style"),
-    Input("sidebar-toggle", "n_clicks"),
+    Input("sidebar_toggle", "n_clicks"),
     State("sidebar", "style"),
     State("page_content", "style"),
     prevent_initial_call=True,
