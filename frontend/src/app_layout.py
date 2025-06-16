@@ -78,39 +78,12 @@ app.layout = dmc.MantineProvider(
 
 
 @callback(
-    Output("app_content", "children"),
-    Input("app_url", "pathname"),
-)
-def display_app_pages(pathname):
-    if pathname == "/":
-        return login.layout()
-    elif pathname == "/logout":
-        return logout.layout()
-    else:
-        return main.layout()
-
-
-@callback(
-    Output("page_content", "children"),
-    Input("main_url", "pathname"),
-    prevent_initial_call=True,
-)
-def navigate_main_content(pathname):
-    if pathname == "/main":
-        return main.layout()
-    elif pathname == "/database":
-        return upload.layout()
-    else:
-        return no_update
-
-
-@callback(
     Output("auth_status", "children"),
     Input("app_url", "pathname"),
 )
 def update_auth_status(_):
     if current_user.is_authenticated:
-        return logout.logout_click()
+        return no_update
     return dcc.Location(href="/", id="login_link")
 
 
@@ -129,3 +102,29 @@ def login_button_click(n_clicks, username, password):
             login_user(User(username))
             return dcc.Location(href="/main", id="chatbot_link")
         return "Invalid Credentials"
+
+
+@callback(
+    Output("app_content", "children"),
+    Input("app_url", "pathname"),
+)
+def display_app_pages(pathname):
+    if pathname == "/":
+        return login.layout()
+    elif pathname == "/logout":
+        return logout.layout()
+    else:
+        return main.layout()
+
+
+@callback(
+    Output("page_content", "children"),
+    Input("main_url", "pathname"),
+)
+def navigate_main_content(pathname):
+    if pathname == "/main":
+        return main.layout()
+    elif pathname == "/database":
+        return upload.layout()
+    else:
+        return main.layout()
