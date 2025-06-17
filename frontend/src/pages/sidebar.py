@@ -69,7 +69,7 @@ def sidebar_layout():
                     ),
                     # New Chat link
                     dmc.NavLink(
-                        label="New Chat",
+                        label="Chat",
                         href="/new_chat",
                         leftSection=DashIconify(
                             icon="bx:chat",
@@ -110,8 +110,9 @@ def sidebar_layout():
                                             "color": "gray",
                                             "text-decoration": "red",
                                         },
+                                        disabled=True,
                                     )
-                                    for i in range(100)
+                                    for i in range(10)
                                 ],
                             )
                         ],
@@ -150,7 +151,7 @@ def sidebar_layout():
         id="sidebar",
         style={
             "height": "100%",
-            "width": "25rem",
+            "width": "20rem",
             "position": "fixed",
             "top": 0,
             "left": 0,
