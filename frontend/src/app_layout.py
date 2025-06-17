@@ -20,7 +20,7 @@ from flask import Flask
 from flask_login import LoginManager, UserMixin, current_user, login_user
 
 from .credentials import VALID_USERNAME_PASSWORD
-from .pages import login, logout, main, upload
+from .pages import chat_ui, login, logout, main, upload
 
 load_dotenv()
 
@@ -126,5 +126,7 @@ def navigate_main_content(pathname):
         return main.layout()
     elif pathname == "/database":
         return upload.layout()
+    elif pathname == "/new_chat":
+        return chat_ui.layout()
     else:
         return main.layout()
