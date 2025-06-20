@@ -250,7 +250,7 @@ dash.clientside_callback(
     State("chat_store", "data"),
     prevent_initial_call=True,
 )
-def send_message(n_clicks, user_message, chat_messages):
+def store_messages(n_clicks, user_message, chat_messages):
     if ctx.triggered_id == "chat_submit_button" and user_message:
         # Add user message to chat
         chat_messages.append({"sender": "user", "text": user_message})
