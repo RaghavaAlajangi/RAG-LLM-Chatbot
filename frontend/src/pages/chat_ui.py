@@ -269,7 +269,7 @@ def store_messages(n_clicks, user_message, chat_messages):
     Output("chat_area", "children"),
     Input("chat_store", "data"),
 )
-def update_chat_history(chat_messages):
+def update_chat_area(chat_messages):
     return [
         chat_bubble(msg["text"], msg["sender"], idx)
         for idx, msg in enumerate(chat_messages)
