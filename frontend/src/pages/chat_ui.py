@@ -16,6 +16,19 @@ model_name = os.environ.get("GWDG_MODEL_NAME")
 client = OpenAI(api_key=api_key, base_url=base_url)
 
 
+def get_llm_response(user_message):
+    """Get LLM model response."""
+    try:
+        completion = client.completions.create(
+            model=model_name,
+            prompt=user_message,
+            max_tokens=512,
+        )
+        return completion.choices[0].text.strip()
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 def chat_bubble(message, role="user", idx=0):
     """Renders a chat bubble with action icons."""
     # Common styles
@@ -242,21 +255,12 @@ def send_message(n_clicks, user_message, chat_messages):
         # Add user message to chat
         chat_messages.append({"sender": "user", "text": user_message})
 
-        # Get OpenAI response
-        try:
-            completion = client.completions.create(
-                model=model_name,
-                prompt=user_message,
-                max_tokens=512,
-            )
-            bot_message = completion.choices[0].text.strip()
-        except Exception as e:
-            bot_message = f"Error: {str(e)}"
+        llm_response = get_llm_response(user_message)
 
         # Add bot message to chat
-        chat_messages.append({"sender": "bot", "text": bot_message})
+        chat_messages.append({"sender": "bot", "text": llm_response})
 
-        return chat_messages, ""  # Clear input
+        return chat_messages, ""
 
     return chat_messages, ""
 
