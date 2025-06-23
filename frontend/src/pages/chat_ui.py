@@ -117,6 +117,7 @@ def chat_bubble(message, role="user", idx=0):
                 ],
                 align="center",
             )
+            icon_overlay = html.Div()
         else:
             message_format = fmc.FefferyMarkdown(
                 markdownStr=message,
@@ -128,18 +129,20 @@ def chat_bubble(message, role="user", idx=0):
                 },
                 className="table-scrollable",
             )
-        icon_overlay = html.Div(
-            [
-                dmc.ActionIcon(
-                    DashIconify(
-                        icon="solar:copy-bold", color="#adadad", width=20
+
+            icon_overlay = html.Div(
+                [
+                    dmc.ActionIcon(
+                        DashIconify(
+                            icon="solar:copy-bold", color="#adadad", width=20
+                        ),
+                        variant="subtle",
+                        size="lg",
+                        id={"type": "copy_btn", "index": idx, "sender": role},
                     ),
-                    variant="subtle",
-                    size="lg",
-                    id={"type": "copy_btn", "index": idx, "sender": role},
-                ),
-            ]
-        )
+                ]
+            )
+
         return html.Div(
             [html.Div(message_format, style=base_style), icon_overlay]
         )
