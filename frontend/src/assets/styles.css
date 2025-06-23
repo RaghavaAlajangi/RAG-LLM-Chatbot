@@ -178,3 +178,27 @@ a:hover {
     word-break: break-word !important;
     box-sizing: border-box !important;
 }
+
+/* markdown table formatting*/
+.table-scrollable {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    background-color: #3a3b3b;
+}
+
+.table-scrollable table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: auto;
+    display: block;
+    overflow-x: auto;
+    background-color: #3a3b3b;
+}
+
+.table-scrollable th, .table-scrollable td {
+    white-space: normal;
+    word-break: break-word;
+    background-color: #3a3b3b;
+}

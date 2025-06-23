@@ -97,8 +97,8 @@ def chat_bubble(message, role="user", idx=0):
     else:
         base_style.update(
             {
-                # "background": "transparent",
-                "background": "#343541",
+                "background": "transparent",
+                # "background": "#343541",
                 "marginLeft": 0,
                 "marginRight": "auto",
             }
@@ -116,6 +116,7 @@ def chat_bubble(message, role="user", idx=0):
                     "wordBreak": "break-word",
                     "background": "transparent",
                 },
+                className="table-scrollable",
             )
         icon_overlay = html.Div(
             [
