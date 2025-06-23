@@ -104,8 +104,18 @@ def chat_bubble(message, role="user", idx=0):
             }
         )
         if message == "__pending__":
-            message_format = dmc.Skeleton(
-                height=10, radius="xl", darkHidden=True, animate=True
+            message_format = dmc.Group(
+                [
+                    dmc.Loader(
+                        color="white",
+                        size="xs",
+                        type="oval",
+                    ),
+                    dmc.Text(
+                        "Thinking..",
+                    ),
+                ],
+                align="center",
             )
         else:
             message_format = fmc.FefferyMarkdown(
@@ -150,7 +160,7 @@ def chat_input_box(input_id, submit_id, panel_max_width):
                     persistence=True,
                     rightSection=dmc.Center(
                         dmc.ActionIcon(
-                            DashIconify(icon="bi:send"),
+                            DashIconify(icon="streamline:send-email-solid"),
                             color="#adadad",
                             id=submit_id,
                         )
