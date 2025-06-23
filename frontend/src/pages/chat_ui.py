@@ -1,14 +1,25 @@
 import os
 
-import dash
 import dash_mantine_components as dmc
 import feffery_markdown_components as fmc
-from dash import ClientsideFunction, Input, Output, State, ctx, dcc, html
+from dash import (
+    ClientsideFunction,
+    Input,
+    Output,
+    State,
+    callback,
+    clientside_callback,
+    ctx,
+    dcc,
+    html,
+)
 from dash_iconify import DashIconify
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
+
+sys_prompt = {"role": "system", "content": "You are a helpful assistant."}
 
 api_key = os.environ.get("GWDG_API_KEY")
 base_url = os.environ.get("GWDG_ENDPOINT")
@@ -16,43 +27,40 @@ model_name = os.environ.get("GWDG_MODEL_NAME")
 client = OpenAI(api_key=api_key, base_url=base_url)
 
 
-def get_llm_response(user_message):
+def get_llm_response(message_list):
     """Get LLM model response."""
     try:
-        completion = client.completions.create(
+        response = client.chat.completions.create(
             model=model_name,
-            prompt=user_message,
-            max_tokens=512,
+            messages=message_list,
+            stream=True,
         )
-        return completion.choices[0].text.strip()
+        return response
     except Exception as e:
         return f"Error: {str(e)}"
 
 
 def chat_bubble(message, role="user", idx=0):
-    """Renders a chat bubble with action icons."""
-    # Common styles
     base_style = {
         "width": "100%",
-        "color": "#ececf1",  # Text color
-        "padding": "16px",  # Padding inside the bubble
-        "borderRadius": "12px",  # Rounded corners
-        "maxWidth": "100%",  # Adjusted to 100%
-        "marginBottom": "5px",  # Space between messages
+        "color": "#ececf1",
+        "padding": "16px",
+        "borderRadius": "12px",
+        "maxWidth": "100%",
+        "marginBottom": "5px",
         "fontFamily": "Monaco, monospace",
         "position": "relative",
-        "boxShadow": "0 1.5px 4px 0 rgba(0,0,0,0.06)",  # Subtle shadow
-        "whiteSpace": "pre-line",  # for multi-line messages
-        "wordWrap": "break-word",  # Add this line
+        "whiteSpace": "pre-line",
+        "wordWrap": "break-word",
     }
-    # Position and bg color
+
     if role == "user":
         base_style.update(
             {
-                "background": "#343541",  # User message background
+                "background": "#343541",
                 "marginLeft": "auto",
                 "marginRight": 0,
-                "width": "70%",  # Adjusted width for user messages
+                "width": "70%",
             }
         )
         icon_overlay = html.Div(
@@ -63,7 +71,6 @@ def chat_bubble(message, role="user", idx=0):
                     ),
                     variant="subtle",
                     size="lg",
-                    style={"marginRight": "2px"},
                     id={"type": "copy_btn", "index": idx, "sender": role},
                 ),
                 dmc.ActionIcon(
@@ -76,21 +83,32 @@ def chat_bubble(message, role="user", idx=0):
             style={
                 "display": "flex",
                 "gap": "2px",
-                "justifyContent": "flex-end",  # Align icons to the right
-                "alignItems": "flex-end",  # Align icons to the bottom
+                "justifyContent": "flex-end",
             },
         )
-        # message_format = html.Div(message)
-        message_format = dcc.Markdown(message)
+        return html.Div(
+            [html.Div(html.Div(message), style=base_style), icon_overlay]
+        )
+
     else:
         base_style.update(
             {
-                # "background": "#070716",  # Bot message background
-                "background": "transparent",
+                # "background": "transparent",
+                "background": "#343541",
                 "marginLeft": 0,
                 "marginRight": "auto",
             }
         )
+        if message == "__pending__":
+            message_format = dmc.Skeleton(
+                height=10, radius="xl", darkHidden=True, animate=True
+            )
+        else:
+            message_format = fmc.FefferyMarkdown(
+                markdownStr=message,
+                codeTheme="coldark-dark",
+                style={"color": "#ececf1", "background": "transparent"},
+            )
         icon_overlay = html.Div(
             [
                 dmc.ActionIcon(
@@ -101,101 +119,61 @@ def chat_bubble(message, role="user", idx=0):
                     size="lg",
                     id={"type": "copy_btn", "index": idx, "sender": role},
                 ),
-            ],
+            ]
         )
-        message_format = fmc.FefferyMarkdown(
-            markdownStr=message,
-            codeTheme="coldark-dark",  # consistent dark code theme
-            style={"color": "#ececf1", "background": "transparent"},
+        return html.Div(
+            [html.Div(message_format, style=base_style), icon_overlay]
         )
-        # message_format = html.Div(message)
-        # message_format = dcc.Markdown(message)
-    return html.Div(
-        [
-            html.Div(
-                children=[message_format],
-                style=base_style,
-            ),
-            icon_overlay,
-        ]
-    )
 
 
 def chat_input_box(input_id, submit_id, panel_max_width):
     return html.Div(
         [
             dcc.Store(id="chat_store", data=[]),
-            html.Div(
-                [
-                    dcc.Textarea(
-                        id=input_id,
-                        placeholder="Ask anything",
-                        style={
-                            "flex": 1,
-                            "background": "transparent",
-                            "border": "none",
-                            "outline": "none",
-                            "color": "#ececf1",
-                            "fontSize": "15px",
-                            "resize": "none",
-                            "height": "100px",
-                            "overflow": "auto",
-                        },
-                    ),
-                    html.Div(
+            dmc.Paper(
+                dmc.Textarea(
+                    id=input_id,
+                    placeholder="Ask me anything...",
+                    minRows=1,
+                    maxRows=4,
+                    autosize=True,
+                    radius="md",
+                    persistence=True,
+                    rightSection=dmc.Center(
                         dmc.ActionIcon(
-                            DashIconify(
-                                icon="majesticons:send",
-                                color="#adadad",
-                                width=40,
-                            ),
-                            variant="subtle",
-                            size="lg",
+                            DashIconify(icon="bi:send"),
+                            color="#adadad",
                             id=submit_id,
-                        ),
-                        style={
-                            "marginLeft": "10px",
-                            "marginRight": "10px",
-                            "marginTop": "8px",
-                            "width": "28px",
-                            "height": "28px",
-                            "display": "flex",
-                            "alignItems": "center",
-                            "justifyContent": "center",
-                            "fontSize": "22px",
-                            "background": "#36373A",
-                            "borderRadius": "50%",
-                        },
+                        )
                     ),
-                ],
+                    style={
+                        "overflow": "hidden",
+                        "width": "100%",
+                        "boxSizing": "border-box",
+                    },
+                ),
+                radius="lg",
+                p="xs",
                 style={
+                    "maxWidth": panel_max_width,
                     "width": "100%",
+                    "height": "120px",
+                    "backgroundColor": "#3a3b3b",
+                    "borderRadius": "20px",
+                    "padding": "30px 40px",
+                    "position": "fixed",
+                    "bottom": 15,
+                    "zIndex": 1000,
                     "display": "flex",
                     "alignItems": "center",
                 },
             ),
-        ],
-        style={
-            "maxWidth": panel_max_width,  # Match parent chat panel
-            "width": "100%",
-            "display": "flex",
-            "height": "120px",
-            "background": "#36373A",
-            "borderRadius": "20px",
-            "padding": "30px 40px",
-            "boxSizing": "border-box",
-            "position": "fixed",
-            "bottom": 15,
-            "alignItems": "center",
-            "zIndex": 1000,
-        },
+        ]
     )
 
 
 def layout():
-    # Shared panel style for both chat history and chat input box
     PANEL_MAX_WIDTH = "800px"
-
     return dmc.Container(
         fluid=True,
         style={
@@ -203,7 +181,6 @@ def layout():
             "display": "flex",
             "flexDirection": "column",
             "alignItems": "center",
-            # Sidebar or more outer layout goes here if needed
         },
         children=[
             html.Div(
@@ -214,35 +191,35 @@ def layout():
                     "margin": "0 auto",
                 },
                 children=[
+                    html.Br(),
                     dmc.ScrollArea(
                         id="chat_area",
                         type="hover",
-                        scrollbarSize=4,
+                        scrollbarSize=2,
                         offsetScrollbars=True,
-                        style={
-                            "paddingBottom": "200px",
-                        },
+                        style={"paddingBottom": "200px"},
                         children=[],
                     ),
                     chat_input_box(
-                        input_id="chat_input_text",
-                        submit_id="chat_submit_button",
-                        panel_max_width=PANEL_MAX_WIDTH,
+                        "chat_input_text",
+                        "chat_submit_button",
+                        PANEL_MAX_WIDTH,
                     ),
                 ],
-            ),
+            )
         ],
     )
 
 
-dash.clientside_callback(
+clientside_callback(
     ClientsideFunction(namespace="clientside", function_name="enter_button"),
     Output("chat_submit_button", "n_clicks"),
-    [Input("chat_input_text", "n_submit")],
+    Input("chat_input_text", "n_submit"),
 )
 
 
-@dash.callback(
+# Show user message and placeholder bot bubble
+@callback(
     Output("chat_store", "data"),
     Output("chat_input_text", "value"),
     Input("chat_submit_button", "n_clicks"),
@@ -252,25 +229,61 @@ dash.clientside_callback(
 )
 def store_messages(n_clicks, user_message, chat_messages):
     if ctx.triggered_id == "chat_submit_button" and user_message:
-        # Add user message to chat
-        chat_messages.append({"sender": "user", "text": user_message})
-
-        llm_response = get_llm_response(user_message)
-
-        # Add bot message to chat
-        chat_messages.append({"sender": "bot", "text": llm_response})
-
+        msg_idx = len(chat_messages) + 1
+        chat_messages.append(
+            {"sender": "user", "content": user_message, "idx": msg_idx}
+        )
+        chat_messages.append(
+            {"sender": "bot", "content": "__pending__", "idx": msg_idx}
+        )
         return chat_messages, ""
-
     return chat_messages, ""
 
 
-@dash.callback(
+# Render chat bubbles
+@callback(
     Output("chat_area", "children"),
     Input("chat_store", "data"),
+    prevent_initial_call=True,
 )
 def update_chat_area(chat_messages):
     return [
-        chat_bubble(msg["text"], msg["sender"], idx)
-        for idx, msg in enumerate(chat_messages)
+        chat_bubble(msg["content"], msg["sender"], msg["idx"])
+        for msg in chat_messages
     ]
+
+
+# Background streaming bot response
+@callback(
+    Output("chat_store", "data", allow_duplicate=True),
+    Input("chat_store", "data"),
+    prevent_initial_call="initial_duplicate",
+)
+def stream_bot_response(chat_messages):
+    # Find the latest pending message
+    for i in range(len(chat_messages) - 1, -1, -1):
+        if (
+            chat_messages[i]["sender"] == "bot"
+            and chat_messages[i]["content"] == "__pending__"
+        ):
+            user_message = chat_messages[i - 1]["content"] if i > 0 else ""
+            sys_prompt = "you are a helpful assistant."
+            try:
+                response = client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": sys_prompt},
+                        {"role": "user", "content": user_message},
+                    ],
+                    stream=True,
+                )
+                full_response = ""
+                for chunk in response:
+                    if chunk.choices and chunk.choices[0].delta.content:
+                        full_response += chunk.choices[0].delta.content
+                chat_messages[i]["content"] = full_response
+                break
+            except Exception as e:
+                chat_messages[i]["content"] = f"Error: {str(e)}"
+                break
+    return chat_messages
