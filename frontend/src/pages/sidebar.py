@@ -12,7 +12,7 @@ def sidebar_layout():
         children=[
             # Sidebar toggle button
             html.Button(
-                DashIconify(icon="iconoir:sidebar-collapse"),
+                DashIconify(icon="cuida:sidebar-collapse-outline"),
                 id="sidebar_toggle",
                 style={
                     "position": "absolute",
