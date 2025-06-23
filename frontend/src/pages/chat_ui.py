@@ -51,7 +51,11 @@ def chat_bubble(message, role="user", idx=0):
         "fontFamily": "Monaco, monospace",
         "position": "relative",
         "whiteSpace": "pre-line",
+        # Keep the text (quiry and response) in desired space
         "wordWrap": "break-word",
+        "wordBreak": "break-word",
+        "overflowWrap": "break-word",
+        "boxSizing": "border-box",
     }
 
     if role == "user":
@@ -107,7 +111,11 @@ def chat_bubble(message, role="user", idx=0):
             message_format = fmc.FefferyMarkdown(
                 markdownStr=message,
                 codeTheme="coldark-dark",
-                style={"color": "#ececf1", "background": "transparent"},
+                style={
+                    "color": "#ececf1",
+                    "wordBreak": "break-word",
+                    "background": "transparent",
+                },
             )
         icon_overlay = html.Div(
             [
@@ -197,7 +205,12 @@ def layout():
                         type="hover",
                         scrollbarSize=2,
                         offsetScrollbars=True,
-                        style={"paddingBottom": "200px"},
+                        style={
+                            "paddingBottom": "200px",
+                            "overflowX": "hidden",
+                            "maxWidth": PANEL_MAX_WIDTH,
+                            "width": "100%",
+                        },
                         children=[],
                     ),
                     chat_input_box(
