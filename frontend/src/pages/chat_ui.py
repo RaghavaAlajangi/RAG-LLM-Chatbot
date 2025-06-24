@@ -130,7 +130,7 @@ def chat_bubble(message, role="user", idx=0):
                 className="table-scrollable",
             )
 
-            icon_overlay = html.Div(
+            icon_overlay = dmc.Group(
                 [
                     dmc.ActionIcon(
                         DashIconify(
@@ -140,7 +140,37 @@ def chat_bubble(message, role="user", idx=0):
                         size="lg",
                         id={"type": "copy_btn", "index": idx, "sender": role},
                     ),
-                ]
+                    dmc.ActionIcon(
+                        DashIconify(
+                            icon="prime:thumbs-up-fill",
+                            color="#adadad",
+                            width=24,
+                        ),
+                        variant="subtle",
+                        size="lg",
+                        id={
+                            "type": "thumbup_btn",
+                            "index": idx,
+                            "sender": role,
+                        },
+                    ),
+                    dmc.ActionIcon(
+                        DashIconify(
+                            icon="prime:thumbs-down-fill",
+                            color="#adadad",
+                            width=24,
+                        ),
+                        variant="subtle",
+                        size="lg",
+                        id={
+                            "type": "thumbdown_btn",
+                            "index": idx,
+                            "sender": role,
+                        },
+                    ),
+                ],
+                align="center",
+                gap="xs",
             )
 
         return html.Div(
@@ -155,7 +185,7 @@ def chat_input_box(input_id, submit_id, panel_max_width):
             dmc.Paper(
                 dmc.Textarea(
                     id=input_id,
-                    placeholder="Ask me anything...",
+                    placeholder="Ask anything...",
                     minRows=1,
                     maxRows=4,
                     autosize=True,
@@ -163,7 +193,7 @@ def chat_input_box(input_id, submit_id, panel_max_width):
                     persistence=True,
                     rightSection=dmc.Center(
                         dmc.ActionIcon(
-                            DashIconify(icon="streamline:send-email-solid"),
+                            DashIconify(icon="fluent:send-16-filled"),
                             color="#adadad",
                             id=submit_id,
                         )
