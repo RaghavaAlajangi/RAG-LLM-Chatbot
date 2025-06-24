@@ -130,7 +130,7 @@ def chat_bubble(message, role="user", idx=0):
                 className="table-scrollable",
             )
 
-            icon_overlay = html.Div(
+            icon_overlay = dmc.Group(
                 [
                     dmc.ActionIcon(
                         DashIconify(
