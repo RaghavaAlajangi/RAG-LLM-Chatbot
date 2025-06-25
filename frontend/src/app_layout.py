@@ -47,7 +47,7 @@ app.layout = dmc.MantineProvider(
 
 
 @callback(
-    Output("show_auth_status", "children"),
+    Output("login_status", "children"),
     Output("user_token", "data"),
     Input("login_button", "n_clicks"),
     State("user_email", "value"),

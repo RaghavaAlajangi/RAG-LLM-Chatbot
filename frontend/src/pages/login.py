@@ -24,6 +24,7 @@ def layout():
                                 c="#494646",
                                 style={"textAlign": "center"},
                             ),
+                            html.Br(),
                             dmc.TextInput(
                                 label="Email",
                                 placeholder="Enter emial id",
@@ -61,6 +62,11 @@ def layout():
                                     "marginTop": "10px",
                                 },
                             ),
+                            html.Br(),
+                            html.Br(),
+                            html.Div(
+                                id="login_status", style={"color": "red"}
+                            ),
                         ],
                         disabled=False,
                         variant="default",
@@ -69,6 +75,5 @@ def layout():
                     ),
                 ],
             ),
-            html.Div(children="", id="show_auth_status"),
         ],
     )
