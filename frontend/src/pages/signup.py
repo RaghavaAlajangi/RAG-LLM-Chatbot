@@ -1,5 +1,8 @@
 import dash_mantine_components as dmc
-from dash import html
+import requests
+from dash import Input, Output, State, callback, ctx, dcc, html
+
+FASTAPI_URL = "http://localhost:8000"
 
 
 def layout():
@@ -19,47 +22,36 @@ def layout():
                     dmc.Fieldset(
                         children=[
                             dmc.Title(
-                                "Login to RAGbot",
+                                "Sign UP",
                                 order=1,
                                 c="#494646",
                                 style={"textAlign": "center"},
                             ),
                             dmc.TextInput(
                                 label="Email",
-                                placeholder="Enter emial id",
-                                id="user_email",
+                                placeholder="Enter email id",
+                                id="signup_email",
                             ),
                             dmc.PasswordInput(
                                 label="Password",
                                 placeholder="Enter password",
-                                id="user_password",
+                                id="signup_password_1",
+                            ),
+                            dmc.PasswordInput(
+                                label="Re-enter Password",
+                                placeholder="Enter password",
+                                id="signup_password_2",
                             ),
                             html.Br(),
                             dmc.Group(
                                 [
                                     dmc.Button(
-                                        "Login",
-                                        id="login_button",
+                                        "Sign Up",
+                                        id="signup_button",
                                         color="#494646",
                                     )
                                 ],
                                 justify="center",
-                            ),
-                            html.Br(),
-                            dmc.Text(
-                                "Do not have an account?",
-                                c="#494646",
-                                style={"textAlign": "left"},
-                            ),
-                            dmc.Anchor(
-                                "Sign Up",
-                                href="/signup",
-                                underline="always",
-                                style={
-                                    "textAlign": "left",
-                                    "color": "black",
-                                    "marginTop": "10px",
-                                },
                             ),
                         ],
                         disabled=False,
@@ -69,6 +61,32 @@ def layout():
                     ),
                 ],
             ),
-            html.Div(children="", id="show_auth_status"),
+            html.Div(children="", id="show_signup_status"),
         ],
     )
+
+
+@callback(
+    Output("show_signup_status", "children"),
+    Input("signup_button", "n_clicks"),
+    State("signup_email", "value"),
+    State("signup_password_1", "value"),
+    State("signup_password_2", "value"),
+    prevent_initial_call=True,
+)
+def signup_user(n_clicks, email, password1, password2):
+    if not email or not password1 or not password2:
+        return "All fields required."
+    if password1 != password2:
+        return "Passwords do not match."
+    if ctx.triggered_id == "signup_button":
+        resp = requests.post(
+            f"{FASTAPI_URL}/auth/register",
+            json={"email": email, "password": password1},
+            headers={"Content-Type": "application/json"},
+        )
+        if resp.status_code == 201:
+            return dcc.Location(href="/", id="redirect_login")
+        elif resp.status_code == 400:
+            return "Email already exists."
+        return "Signup failed."

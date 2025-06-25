@@ -1,12 +1,9 @@
 import dash_mantine_components as dmc
-from dash import html
+from dash import Input, Output, callback, html, no_update
 from dash_iconify import DashIconify
-from flask_login import current_user, logout_user
 
 
 def layout():
-    if current_user.is_authenticated:
-        logout_user()
     return html.Div(
         [
             dmc.Container(
@@ -64,3 +61,14 @@ def logout_click():
             active="partial",
         ),
     )
+
+
+@callback(
+    Output("user_token", "data", allow_duplicate=True),
+    Input("app_url", "pathname"),
+    prevent_initial_call=True,
+)
+def clear_token_on_logout(pathname):
+    if pathname == "/logout":
+        return None
+    return no_update

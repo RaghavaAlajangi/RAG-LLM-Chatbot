@@ -1,7 +1,8 @@
 import dash_mantine_components as dmc
-from dash import html
+from dash import Input, Output, callback, html
 from dash_iconify import DashIconify
 
+from ..utils import get_current_user
 from .logout import logout_click
 
 
@@ -133,8 +134,7 @@ def sidebar_layout():
                         }
                     ),
                     html.Div(
-                        id="auth_status",
-                        children=logout_click(),
+                        id="logout_status",
                         style={
                             "margin-bottom": "10px",
                         },
@@ -161,6 +161,23 @@ def sidebar_layout():
             "color": "white",
         },
     )
+
+
+@callback(
+    Output("logout_status", "children"),
+    Input("user_token", "data"),
+)
+def show_user(user_token):
+    user_data = get_current_user(user_token)
+    return [
+        dmc.Avatar(
+            name=user_data["email"],
+            color="initials",
+            variant="outline",
+            style={"margin-left": "10px"},
+        ),
+        logout_click(),
+    ]
 
 
 # @callback(
