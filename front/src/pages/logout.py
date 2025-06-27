@@ -3,55 +3,11 @@ from dash import Input, Output, callback, html, no_update
 from dash_iconify import DashIconify
 
 
-def layout():
-    return html.Div(
-        [
-            dmc.Container(
-                style={
-                    "display": "flex",
-                    "justifyContent": "center",
-                    "alignItems": "center",
-                    "minHeight": "80vh",
-                    "color": "gray",
-                    "borderRadius": "8px",
-                    "boxShadow": "0 4px 8px rgba(0, 0, 0, 0.2)",
-                },
-                children=[
-                    dmc.Fieldset(
-                        children=[
-                            dmc.Title(
-                                "You have been logged out",
-                                order=2,
-                                c="#494646",
-                                style={"textAlign": "left"},
-                            ),
-                            dmc.Anchor(
-                                "Login again?",
-                                href="/",
-                                underline="always",
-                                style={
-                                    "textAlign": "left",
-                                    "color": "black",
-                                    "marginTop": "10px",
-                                },
-                            ),
-                        ],
-                        disabled=False,
-                        variant="default",
-                        radius="md",
-                        w="40%",
-                    ),
-                ],
-            ),
-        ]
-    )
-
-
 def logout_click():
     return html.Div(
         dmc.NavLink(
             label="Logout",
-            href="/logout",
+            href="/",
             leftSection=DashIconify(
                 icon="tabler:logout",
                 width=20,
