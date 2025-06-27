@@ -1,4 +1,4 @@
 ### Run Dash frontend app
 ```bash
-python -m front
+python -m frontend --local
 ```

@@ -1,4 +1,4 @@
 ### Run FastAPI backend app
 ```bash
-python -m back
+python -m backend
 ```
