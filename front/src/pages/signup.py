@@ -93,14 +93,17 @@ def layout():
     State("signup_password_2", "value"),
     prevent_initial_call=True,
 )
-def signup_user(n_clicks, email, password1, password2):
+def signup_user(_, email, password1, password2):
+    pre_email = email.strip()
+    pre_pass_1 = password1.strip()
+    pre_pass_2 = password2.strip()
+
     if ctx.triggered_id == "signup_button":
-        if not email or not password1 or not password2:
+        if not pre_email or not pre_pass_1 or not pre_pass_2:
             return "All fields required."
-        if password1 != password2:
+        if pre_pass_1 != pre_pass_2:
             return "Passwords do not match."
-        response = get_signup_response(email, password1)
-        print(response)
+        response = get_signup_response(pre_email, pre_pass_1)
         if response == 201:
             return dcc.Location(href="/", id="redirect_login")
         elif response == 400:

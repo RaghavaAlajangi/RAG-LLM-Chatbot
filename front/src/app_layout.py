@@ -54,12 +54,11 @@ app.layout = dmc.MantineProvider(
     State("user_password", "value"),
     prevent_initial_call=True,
 )
-def login_button_click(n_clicks, user_email, user_password):
+def login_button_click(_, user_email, user_password):
     if ctx.triggered_id == "login_button" and user_email and user_password:
-        resp = get_login_reponse(user_email, user_password)
+        resp = get_login_reponse(user_email.strip(), user_password.strip())
         if resp.status_code == 200:
             token = resp.json()["access_token"]
-            print(token)
             return dcc.Location(href="/main", id="chatbot_link"), token
         return "Invalid Credentials", None
     return "", None
