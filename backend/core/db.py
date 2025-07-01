@@ -1,4 +1,3 @@
-import os
 from collections.abc import AsyncGenerator
 
 from fastapi import Depends
@@ -13,9 +12,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql+asyncpg://rag_user:rag_pass@localhost/rag_db"
-)
+from .config import settings
 
 
 class Base(DeclarativeBase):
@@ -26,7 +23,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     pass
 
 
-engine = create_async_engine(DATABASE_URL)
+engine = create_async_engine(settings.POSTGRES_DB)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
