@@ -1,6 +1,6 @@
 import click
 
-from .src.app_layout import app
+from .app import app
 
 
 @click.command()
