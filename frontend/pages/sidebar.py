@@ -1,5 +1,5 @@
 import dash_mantine_components as dmc
-from dash import Input, Output, callback, html
+from dash import Input, Output, callback, dcc, html
 from dash_iconify import DashIconify
 
 from ..utils import get_current_user
@@ -169,15 +169,17 @@ def sidebar_layout():
 )
 def show_user(user_token):
     user_data = get_current_user(user_token)
-    return [
-        dmc.Avatar(
-            name=user_data["email"],
-            color="initials",
-            variant="outline",
-            style={"margin-left": "10px"},
-        ),
-        logout_click(),
-    ]
+    if user_data:
+        return [
+            dmc.Avatar(
+                name=user_data["email"],
+                color="initials",
+                variant="outline",
+                style={"margin-left": "10px"},
+            ),
+            logout_click(),
+        ]
+    return dcc.Location(href="/", id="redirect_to_login")
 
 
 # @callback(
