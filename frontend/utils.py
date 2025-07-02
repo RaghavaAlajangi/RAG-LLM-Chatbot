@@ -29,3 +29,25 @@ def get_signup_response(user_email, user_password):
         headers={"Content-Type": "application/json"},
     )
     return response.status_code
+
+
+def get_model_list():
+    response = requests.get(f"{BACKEND_URL}/rag/models")
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+
+def get_chat_response(token, prompt, model_name, chat_history=[]):
+    response = requests.post(
+        f"{BACKEND_URL}/rag/chat",
+        json={
+            "prompt": prompt,
+            "model": model_name,
+            "chat_history": chat_history,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    if response.status_code == 200:
+        return response.json()
+    return None

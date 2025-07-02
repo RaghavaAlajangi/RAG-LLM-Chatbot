@@ -17,6 +17,8 @@ from dash_iconify import DashIconify
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from ..utils import get_chat_response, get_model_list
+
 load_dotenv()
 
 sys_prompt = {"role": "system", "content": "You are a helpful assistant."}
@@ -314,9 +316,11 @@ def update_chat_area(chat_messages):
 @callback(
     Output("chat_store", "data", allow_duplicate=True),
     Input("chat_store", "data"),
+    Input("user_token", "data"),
     prevent_initial_call="initial_duplicate",
 )
-def stream_bot_response(chat_messages):
+def stream_bot_response(chat_messages, user_token):
+    model_name = get_model_list()[0]
     # Find the latest pending message
     for i in range(len(chat_messages) - 1, -1, -1):
         if (
@@ -324,23 +328,15 @@ def stream_bot_response(chat_messages):
             and chat_messages[i]["content"] == "__pending__"
         ):
             user_message = chat_messages[i - 1]["content"] if i > 0 else ""
-            sys_prompt = "you are a helpful assistant."
-            try:
-                response = client.chat.completions.create(
-                    model=model_name,
-                    messages=[
-                        {"role": "system", "content": sys_prompt},
-                        {"role": "user", "content": user_message},
-                    ],
-                    stream=True,
+            response = get_chat_response(
+                user_token, user_message, model_name, chat_history=[]
+            )
+            docs = list(
+                set(
+                    f"- <{doc['source']}>" for doc in response["relevant_docs"]
                 )
-                full_response = ""
-                for chunk in response:
-                    if chunk.choices and chunk.choices[0].delta.content:
-                        full_response += chunk.choices[0].delta.content
-                chat_messages[i]["content"] = full_response
-                break
-            except Exception as e:
-                chat_messages[i]["content"] = f"Error: {str(e)}"
-                break
+            )
+            src_docs = "\n ### Source Docements:\n" + "\n".join(docs)
+            chat_messages[i]["content"] = response["answer"] + src_docs
+            break
     return chat_messages
