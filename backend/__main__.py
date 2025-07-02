@@ -4,7 +4,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from .api import auth
+from .api import auth, rag
 from .core.db import create_db_and_tables
 
 load_dotenv()
@@ -25,7 +25,8 @@ def root():
 
 
 app.include_router(auth.router)
+app.include_router(rag.router)
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, log_level="info", port=8000)
+    uvicorn.run(app, log_level="info", port=1050)
