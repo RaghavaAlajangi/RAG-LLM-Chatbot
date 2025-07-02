@@ -9,7 +9,7 @@ embedder = HuggingFaceEmbeddings(
     model_name="BAAI/bge-small-en-v1.5",
     model_kwargs={"device": "cuda"},
     encode_kwargs={"normalize_embeddings": True, "batch_size": 16},
-    cache_folder=model_dir,
+    cache_folder=str(model_dir),
     multi_process=False,
 )
 
