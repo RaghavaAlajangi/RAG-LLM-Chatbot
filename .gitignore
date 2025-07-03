@@ -179,5 +179,3 @@ llm_models/**/*
 !llm_models/.gitkeep
 # ignore raw data
 raw_data/*
-raw_data/**/*
-!raw_data/.gitkeep
