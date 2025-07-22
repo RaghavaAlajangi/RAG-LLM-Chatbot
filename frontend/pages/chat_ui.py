@@ -1,5 +1,3 @@
-import os
-
 import dash_mantine_components as dmc
 import feffery_markdown_components as fmc
 from dash import (
@@ -15,31 +13,12 @@ from dash import (
 )
 from dash_iconify import DashIconify
 from dotenv import load_dotenv
-from openai import OpenAI
 
 from ..utils import get_chat_response, get_model_list
 
 load_dotenv()
 
 sys_prompt = {"role": "system", "content": "You are a helpful assistant."}
-
-api_key = os.environ.get("GWDG_API_KEY")
-base_url = os.environ.get("GWDG_ENDPOINT")
-model_name = os.environ.get("GWDG_MODEL_NAME")
-client = OpenAI(api_key=api_key, base_url=base_url)
-
-
-def get_llm_response(message_list):
-    """Get LLM model response."""
-    try:
-        response = client.chat.completions.create(
-            model=model_name,
-            messages=message_list,
-            stream=True,
-        )
-        return response
-    except Exception as e:
-        return f"Error: {str(e)}"
 
 
 def chat_bubble(message, role="user", idx=0):
@@ -336,7 +315,7 @@ def stream_bot_response(chat_messages, user_token):
                     f"- <{doc['source']}>" for doc in response["relevant_docs"]
                 )
             )
-            src_docs = "\n ### Source Docements:\n" + "\n".join(docs)
+            src_docs = "\n #### Source Docements:\n" + "\n".join(docs)
             chat_messages[i]["content"] = response["answer"] + src_docs
             break
     return chat_messages
