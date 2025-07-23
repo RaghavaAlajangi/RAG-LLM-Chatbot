@@ -4,7 +4,6 @@ from langchain_openai import ChatOpenAI
 from openai import OpenAI
 
 from ..core.config import settings
-from .prompts import prompt_1
 from .retriever import get_retriever
 
 openai_client = OpenAI(
@@ -21,9 +20,9 @@ def llm_generator(model_name):
     )
 
 
-def get_rag_chain(model_name):
+def get_rag_chain(model_name, prompt):
     llm = llm_generator(model_name)
     retriever = get_retriever()
-    llm_chain = create_stuff_documents_chain(llm, prompt_1)
+    llm_chain = create_stuff_documents_chain(llm, prompt)
     qa_chain = create_retrieval_chain(retriever, llm_chain)
     return qa_chain

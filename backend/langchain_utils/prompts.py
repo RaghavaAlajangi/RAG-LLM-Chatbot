@@ -1,6 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-prompt_text = """
+prompt_text1 = """
     You are a helpful and intelligent assistant that answers questions
     using retrieved context.
 
@@ -25,15 +25,40 @@ prompt_text = """
     "I am not sure about that based on the available information."
     """
 
-prompt_1 = ChatPromptTemplate.from_messages(
-    [
-        # 1. System message
-        ("system", prompt_text),
-        # 2. Chat history
-        MessagesPlaceholder(variable_name="chat_history"),
-        # 3. New user question
-        ("user", "{input}"),
-        # 4. Retrieved context
-        ("system", "🧠 Context retrieved from documents:\n{context}"),
-    ]
-)
+prompt_text2 = """
+You are a senior research assistant and expert Python software developer.
+Your role is to help researchers understand the organization's internal
+research materials, codebases, and documentation.
+
+**Always aim to:**
+- Provide clear, accurate answers.
+- Explain concepts in plain, accessible language using bullet points.
+- Avoid technical jargon where possible, or define it if used.
+- Summarize and synthesize information rather than copying text verbatim.
+- When relevant, include examples or analogies to aid understanding.
+- If the question involves *analyzing or explaining provided code*, explain
+what that code does step by step, in simple terms. **Do not generate new code
+unless explicitly requested and relevant to the provided context.**
+- If the question is unclear, ask clarifying questions before answering.
+- If unsure of the answer, say:
+    "I am not sure about that based on the available information."
+"""
+
+
+def get_prompt(prompt_text=None):
+
+    if prompt_text is None:
+        prompt_text = prompt_text2
+
+    return ChatPromptTemplate.from_messages(
+        [
+            # 1. System message
+            ("system", prompt_text),
+            # 2. Chat history
+            MessagesPlaceholder(variable_name="chat_history"),
+            # 3. New user question
+            ("user", "{input}"),
+            # 4. Retrieved context
+            ("system", "Context retrieved from documents:\n{context}"),
+        ]
+    )
