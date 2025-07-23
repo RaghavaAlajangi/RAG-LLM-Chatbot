@@ -38,11 +38,10 @@ def get_model_list():
     return None
 
 
-def get_chat_response(token, prompt, model_name, chat_history=[]):
+def get_chat_response(token, model_name, chat_history):
     response = requests.post(
         f"{BACKEND_URL}/rag/chat",
         json={
-            "prompt": prompt,
             "model": model_name,
             "chat_history": chat_history,
         },
@@ -51,3 +50,34 @@ def get_chat_response(token, prompt, model_name, chat_history=[]):
     if response.status_code == 200:
         return response.json()
     return None
+
+
+def fetch_chat(token, chat_id):
+    response = requests.get(
+        f"{BACKEND_URL}/chat_db/fetch_chat/{chat_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+
+def update_chat(token, chat_id, messages):
+    response = requests.post(
+        f"{BACKEND_URL}/chat_db/update_chat/{chat_id}",
+        json={"messages": messages},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+
+def get_chat_list(token):
+    response = requests.get(
+        f"{BACKEND_URL}/chat_db/list_chats",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    if response.status_code == 200:
+        return response.json()
+    return []
