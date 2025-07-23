@@ -1,8 +1,8 @@
 import dash_mantine_components as dmc
-from dash import Input, Output, callback, dcc, html
+from dash import Input, Output, State, callback, dcc, html
 from dash_iconify import DashIconify
 
-from ..utils import get_current_user
+from ..utils import get_chat_list, get_current_user
 from .logout import logout_click
 
 
@@ -95,26 +95,7 @@ def sidebar_layout():
                         # w=350,
                         children=[
                             html.Div(
-                                [
-                                    dmc.NavLink(
-                                        label=f"Chat {i+1}",
-                                        href=f"/{i+1}",
-                                        leftSection=DashIconify(
-                                            icon="tabler:gauge"
-                                        ),
-                                        rightSection=DashIconify(
-                                            icon="tabler-chevron-right"
-                                        ),
-                                        # autoContrast=True,
-                                        color="red",
-                                        style={
-                                            "color": "gray",
-                                            "text-decoration": "red",
-                                        },
-                                        disabled=True,
-                                    )
-                                    for i in range(10)
-                                ],
+                                id="chat_history_list",
                             )
                         ],
                     ),
@@ -180,6 +161,34 @@ def show_user(user_token):
             logout_click(),
         ]
     return dcc.Location(href="/", id="redirect_to_login")
+
+
+@callback(
+    Output("chat_history_list", "children"),
+    Input("user_token", "data"),
+    State("chat_history_list", "children"),
+)
+def show_chat_history_links(user_token, chat_history_list):
+    # Note: this api call can be removed if chat_list is cached
+    chat_list = get_chat_list(user_token)
+    if chat_list:
+        return [
+            dmc.NavLink(
+                label=chat["title"] or "Untitled Chat",
+                href=f"/chat/{chat['id']}",
+                leftSection=DashIconify(icon="tabler:gauge"),
+                rightSection=DashIconify(icon="tabler-chevron-right"),
+                style={
+                    "color": "gray",
+                    "text-decoration": "red",
+                },
+                # variant="subtle",
+                # color="white",
+                active="partial",
+            )
+            for chat in chat_list
+        ]
+    return chat_history_list
 
 
 # @callback(
