@@ -14,11 +14,9 @@ from dash import (
 from dash_iconify import DashIconify
 from dotenv import load_dotenv
 
-from ..utils import get_chat_response, get_model_list
+from ..utils import fetch_chat, get_chat_response, get_model_list, update_chat
 
 load_dotenv()
-
-sys_prompt = {"role": "system", "content": "You are a helpful assistant."}
 
 
 def chat_bubble(message, role="user", idx=0):
@@ -162,7 +160,6 @@ def chat_bubble(message, role="user", idx=0):
 def chat_input_box(input_id, submit_id, panel_max_width):
     return html.Div(
         [
-            dcc.Store(id="chat_store", data=[]),
             dmc.Paper(
                 dmc.Textarea(
                     id=input_id,
@@ -205,8 +202,9 @@ def chat_input_box(input_id, submit_id, panel_max_width):
     )
 
 
-def layout():
+def layout(user_token, chat_id):
     PANEL_MAX_WIDTH = "800px"
+    chat_msg_list = fetch_chat(user_token, chat_id)
     return dmc.Container(
         fluid=True,
         style={
@@ -216,6 +214,16 @@ def layout():
             "alignItems": "center",
         },
         children=[
+            dcc.Store(
+                id="chat_msg_store",
+                data=chat_msg_list,
+                storage_type="session",
+            ),
+            dcc.Store(
+                id="chat_id_store",
+                data=chat_id,
+                storage_type="session",
+            ),
             html.Div(
                 style={
                     "position": "relative",
@@ -244,7 +252,7 @@ def layout():
                         PANEL_MAX_WIDTH,
                     ),
                 ],
-            )
+            ),
         ],
     )
 
@@ -258,64 +266,66 @@ clientside_callback(
 
 # Show user message and placeholder bot bubble
 @callback(
-    Output("chat_store", "data"),
+    Output("chat_msg_store", "data"),
     Output("chat_input_text", "value"),
     Input("chat_submit_button", "n_clicks"),
     State("chat_input_text", "value"),
-    State("chat_store", "data"),
+    State("chat_msg_store", "data"),
     prevent_initial_call=True,
 )
-def store_messages(n_clicks, user_message, chat_messages):
+def store_messages(n_clicks, user_message, cached_chat_msgs):
     if ctx.triggered_id == "chat_submit_button" and user_message:
-        msg_idx = len(chat_messages) + 1
-        chat_messages.append(
-            {"sender": "user", "content": user_message, "idx": msg_idx}
+        msg_idx = len(cached_chat_msgs) + 1
+        cached_chat_msgs.append(
+            {"role": "user", "content": user_message, "idx": msg_idx}
         )
-        chat_messages.append(
-            {"sender": "bot", "content": "__pending__", "idx": msg_idx}
+        cached_chat_msgs.append(
+            {"role": "assistant", "content": "__pending__", "idx": msg_idx}
         )
-        return chat_messages, ""
-    return chat_messages, ""
+        return cached_chat_msgs, ""
+    return cached_chat_msgs, ""
 
 
-# Render chat bubbles
 @callback(
     Output("chat_area", "children"),
-    Input("chat_store", "data"),
+    Input("chat_msg_store", "data"),
     prevent_initial_call=True,
 )
-def update_chat_area(chat_messages):
+def update_chat_area(cached_chat_msgs):
     return [
-        chat_bubble(msg["content"], msg["sender"], msg["idx"])
-        for msg in chat_messages
+        chat_bubble(msg["content"], msg["role"], idx)
+        for idx, msg in enumerate(cached_chat_msgs)
     ]
 
 
-# Background streaming bot response
 @callback(
-    Output("chat_store", "data", allow_duplicate=True),
-    Input("chat_store", "data"),
+    Output("chat_msg_store", "data", allow_duplicate=True),
+    Input("chat_msg_store", "data"),
     Input("user_token", "data"),
+    Input("chat_id_store", "data"),
     prevent_initial_call="initial_duplicate",
 )
-def stream_bot_response(chat_messages, user_token):
+def stream_bot_response(cached_chat_msgs, user_token, cached_chat_id):
     model_name = get_model_list()[0]
-    # Find the latest pending message
-    for i in range(len(chat_messages) - 1, -1, -1):
-        if (
-            chat_messages[i]["sender"] == "bot"
-            and chat_messages[i]["content"] == "__pending__"
-        ):
-            user_message = chat_messages[i - 1]["content"] if i > 0 else ""
-            response = get_chat_response(
-                user_token, user_message, model_name, chat_history=[]
-            )
-            docs = list(
-                set(
-                    f"- <{doc['source']}>" for doc in response["relevant_docs"]
-                )
-            )
-            src_docs = "\n #### Source Docements:\n" + "\n".join(docs)
-            chat_messages[i]["content"] = response["answer"] + src_docs
-            break
-    return chat_messages
+
+    if len(cached_chat_msgs) > 0 and cached_chat_id is not None:
+        bot_pending_msg = cached_chat_msgs[-1]["content"]
+
+        if bot_pending_msg != "__pending__":
+            return cached_chat_msgs
+
+        response = get_chat_response(
+            user_token, model_name, chat_history=cached_chat_msgs[:-1]
+        )
+
+        cached_chat_msgs[-1]["content"] = response["answer"]
+
+        # Update the chat in the backend DB
+        update_chat(
+            user_token,
+            cached_chat_id,
+            cached_chat_msgs,
+        )
+
+        return cached_chat_msgs
+    return cached_chat_msgs
