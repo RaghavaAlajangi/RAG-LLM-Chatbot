@@ -14,7 +14,7 @@ from dash import (
 from dotenv import load_dotenv
 
 from .pages import chat_ui, login, logout, main, signup, upload
-from .utils import get_login_reponse
+from .utils import get_chat_list, get_login_reponse
 
 load_dotenv()
 
@@ -81,14 +81,24 @@ def display_app_pages(pathname):
 
 @callback(
     Output("page_content", "children"),
+    Input("user_token", "data"),
     Input("main_url", "pathname"),
 )
-def navigate_main_content(pathname):
+def navigate_main_content(user_token, pathname):
+    chat_list = get_chat_list(user_token)
+    chat_ids = [chat["id"] for chat in chat_list] if chat_list else []
+
     if pathname == "/main":
         return main.layout()
     elif pathname == "/database":
         return upload.layout()
     elif pathname == "/new_chat":
         return chat_ui.layout()
+    elif pathname.startswith("/chat/"):
+        curr_chat_id = pathname.split("/")[2]
+        if curr_chat_id in chat_ids:
+            return chat_ui.layout(user_token, curr_chat_id)
+        else:
+            pass
     else:
-        return main.layout()
+        return chat_ui.layout(user_token, chat_ids[-1])
