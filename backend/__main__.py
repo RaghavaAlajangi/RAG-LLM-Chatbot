@@ -4,7 +4,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from .api import auth, rag
+from .api import auth, chat_db, rag
 from .core.db import create_db_and_tables
 
 load_dotenv()
@@ -26,6 +26,7 @@ def root():
 
 app.include_router(auth.router)
 app.include_router(rag.router)
+app.include_router(chat_db.router)
 
 
 if __name__ == "__main__":
