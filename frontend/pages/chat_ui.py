@@ -303,7 +303,7 @@ def update_chat_area(cached_chat_msgs):
     Input("chat_msg_store", "data"),
     Input("user_token", "data"),
     Input("chat_id_store", "data"),
-    prevent_initial_call="initial_duplicate",
+    prevent_initial_call=True,
 )
 def stream_bot_response(cached_chat_msgs, user_token, cached_chat_id):
     model_name = get_model_list()[0]
