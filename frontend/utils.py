@@ -15,11 +15,14 @@ def get_current_user(token):
 
 
 def get_login_reponse(user_email, user_password):
-    return requests.post(
+    response = requests.post(
         f"{BACKEND_URL}/auth/jwt/login",
         data={"username": user_email, "password": user_password},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+    if response.status_code == 200:
+        return response.json()["access_token"]
+    return None
 
 
 def get_signup_response(user_email, user_password):
