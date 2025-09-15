@@ -1,13 +1,10 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from .api import auth, chat_db, rag
 from .core.db import create_db_and_tables
-
-load_dotenv()
 
 
 @asynccontextmanager
